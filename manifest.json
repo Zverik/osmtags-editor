@@ -1,0 +1,42 @@
+{
+  "manifest_version": 2,
+  "name": "OpenStreetMap Tags Editor",
+  "version": "1.0",
+
+  "description": "Adds an \"edit tags\" button to every object on osm.org.",
+
+  "icons": {
+    "48": "osmtags-48.png",
+    "96": "osmtags-96.png"
+  },
+
+  "content_scripts": [
+      {
+          "matches": [
+              "https://www.openstreetmap.org/*"
+          ],
+          "js": [
+              "osmorg-editor.js",
+              "osm-auth.iife.min.js"
+          ]
+      }
+  ],
+
+  "background": {
+      "scripts": ["sidebar-listener.js"],
+      "persistent": false
+  },
+
+  "web_accessible_resources": ["land.html", "land.js"],
+
+  "permissions": [
+    "storage",
+    "webNavigation"
+  ],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "osmorg-editor@ilya.zverev.info"
+    }
+  }
+}
