@@ -7,7 +7,8 @@
 
   "icons": {
     "48": "osmtags-48.png",
-    "96": "osmtags-96.png"
+    "96": "osmtags-96.png",
+    "128": "osmtags-128.png"
   },
 
   "content_scripts": [
