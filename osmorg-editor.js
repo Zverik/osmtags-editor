@@ -5,6 +5,8 @@ var errorPane = null;
 var originalPanel = null;
 var originalObject = null;
 
+const apiBase = 'https://www.openstreetmap.org/api/0.6/';
+
 // Replaces the input area with the original object info.
 function closeEditor() {
     editorArea.replaceWith(originalPanel);
@@ -20,10 +22,27 @@ function setError(message) {
         errorPane.textContent = message;
 }
 
+// Extracts type and id from the URL.
+function getTypeAndRef() {
+    const baseParts = window.location.pathname.split('/');
+    let i = 0;
+    while (i < baseParts.length && baseParts[i] != 'node' && baseParts[i] != 'way' && baseParts[i] != 'relation') i++;
+    if (i >= baseParts.length) return null;
+    return {
+        type: baseParts[i],
+        ref: baseParts[i + 1],
+        part: baseParts[i] + '/' + baseParts[i + 1]
+    };
+}
+
 // Queries OSM API for the element data and populates the text area.
 function queryForTags() {
-    const basePath = window.location.pathname;
-    const url = 'https://www.openstreetmap.org/api/0.6' + basePath + '.json';
+    const typeRef = getTypeAndRef();
+    if (!typeRef) {
+        closeEditor();
+        return;
+    }
+    const url = apiBase + typeRef.part + '.json';
     fetch(url).then(response => response.json()).then(response => {
         // If the element was deleted, or there have been an error, close the editor.
         if (!response.elements) {
@@ -145,14 +164,12 @@ function uploadTags() {
     }
 
     // Prepare changeset payload.
-    const baseParts = window.location.pathname.split('/');
-    const elemType = baseParts[baseParts.length - 2];
-    const elemRef = baseParts[baseParts.length - 1];
+    const typeRef = getTypeAndRef();
     const changesetTags = {
         'created_by': 'Osm.Org Tags Editor',
         // "Changed tags surface, ref of way 12345".
         'comment': 'Changed tag' + (modifiedKeys.length > 1 ? 's ' : ' ') +
-            modifiedKeys.join(', ') + ' of ' + elemType + ' ' + elemRef
+            modifiedKeys.join(', ') + ' of ' + typeRef.type + ' ' + typeRef.ref
     };
     let changesetPayload = document.implementation.createDocument(null, 'osm');
     let cs = changesetPayload.createElement('changeset');
@@ -164,7 +181,7 @@ function uploadTags() {
     const auth = makeAuth();
     auth.xhr({
         method: 'PUT',
-        path: 'https://www.openstreetmap.org/api/0.6/changeset/create',
+        path: apiBase + 'changeset/create',
         prefix: false, // not relying on the default prefix.
         content: chPayloadStr
     }, function(err, result) {
@@ -188,14 +205,14 @@ function uploadTags() {
         // Upload the new element.
         auth.xhr({
             method: 'PUT',
-            path: 'https://www.openstreetmap.org/api/0.6/' + elemType + '/' + elemRef,
+            path: apiBase + typeRef.part,
             prefix: false,
             content: elemPayloadStr
         }, function(err, result) {
             // Close the changeset regardless.
             auth.xhr({
                 method: 'PUT',
-                path: 'https://www.openstreetmap.org/api/0.6/changeset/' + changesetId + '/close',
+                path: apiBase + 'changeset/' + changesetId + '/close',
                 prefix: false
             }, function(err1, result) {
                 // Only after closing the changeset reload the page.
@@ -333,11 +350,14 @@ function updateButton(data, sender, sendResponse) {
     if (!addTheButton()) {
         window.setTimeout(function() {
             if (!addTheButton()) {
-                window.setTimeout(addTheButton, 500);
+                window.setTimeout(addTheButton, 1000);
             }
         }, 300);
     }
 }
+
+// When opening the element page directly, the background process does not run.
+updateButton();
 
 // Listen to messages from the background script.
 chrome.runtime.onMessage.addListener(updateButton);
