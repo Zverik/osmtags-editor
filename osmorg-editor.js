@@ -255,7 +255,7 @@ function createEditorPanel() {
     let cancelButton = document.createElement('input');
     cancelButton.type = 'submit';
     cancelButton.name = 'cancel';
-    cancelButton.className = 'btn btn-primary';
+    cancelButton.className = 'btn btn-danger';
     cancelButton.value = 'Cancel';
     cancelButton.addEventListener('click', function(e) {
         // Nothing to save, just return the original panel.
