@@ -55,7 +55,7 @@ function queryForTags() {
         let tags = [];
         if (originalObject.tags) {
             for (const [k, v] of Object.entries(originalObject.tags)) {
-                tags.unshift(k + ' = ' + v);
+                tags.push(k + ' = ' + v);
             }
         }
         textArea.value = tags.join('\n');;
