@@ -58,7 +58,7 @@ function queryForTags() {
                 tags.unshift(k + ' = ' + v);
             }
         }
-        textArea.value = tags.join('\n');;
+        textArea.value = tags.reverse().join('\n');;
         textArea.focus();
         // We built the editor with a disabled saving button.
         saveButton.disabled = null;
