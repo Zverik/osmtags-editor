@@ -155,6 +155,7 @@ function makeAuth() {
 function uploadTags() {
     setError();
     if (!originalObject) return;
+    const xmlHeader = '<?xml version="1.0" encoding="utf-8"?>';
     const newTags = buildTags();
     const modifiedKeys = getModifiedTags(newTags, originalObject['tags'] || {});
     if (modifiedKeys.length == 0) {
@@ -175,7 +176,7 @@ function uploadTags() {
     let cs = changesetPayload.createElement('changeset');
     changesetPayload.documentElement.appendChild(cs);
     tagsToXml(changesetPayload, cs, changesetTags);
-    const chPayloadStr = new XMLSerializer().serializeToString(changesetPayload);
+    const chPayloadStr = xmlHeader + new XMLSerializer().serializeToString(changesetPayload);
 
     // Open changeset.
     const auth = makeAuth();
@@ -183,6 +184,7 @@ function uploadTags() {
         method: 'PUT',
         path: apiBase + 'changeset/create',
         prefix: false, // not relying on the default prefix.
+        headers: { 'Content-Type': 'application/xml' },
         content: chPayloadStr
     }, function(err, result) {
         if (err) {
@@ -200,13 +202,14 @@ function uploadTags() {
         let elem = buildObject(elemPayload, newTags);
         elem.setAttribute('changeset', changesetId);
         elemPayload.documentElement.appendChild(elem);
-        const elemPayloadStr = new XMLSerializer().serializeToString(elemPayload);
+        const elemPayloadStr = xmlHeader + new XMLSerializer().serializeToString(elemPayload);
 
         // Upload the new element.
         auth.xhr({
             method: 'PUT',
             path: apiBase + typeRef.part,
             prefix: false,
+            headers: { 'Content-Type': 'application/xml' },
             content: elemPayloadStr
         }, function(err, result) {
             // Close the changeset regardless.
