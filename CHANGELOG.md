@@ -1,6 +1,6 @@
 # Tags Editor Changes
 
-## 1.2
+## 1.2 (2024-02-25)
 
 * Fixed saving changes with a `%` symbol inside tags.
 * Newline character is replaced with `\\` for editing.
