@@ -55,7 +55,7 @@ function queryForTags() {
         let tags = [];
         if (originalObject.tags) {
             for (const [k, v] of Object.entries(originalObject.tags)) {
-                tags.push(k + ' = ' + v);
+                tags.push(k + ' = ' + v.replaceAll('\n', '\\\\'));
             }
         }
         textArea.value = tags.join('\n');;
@@ -80,7 +80,7 @@ function buildTags() {
         const k = line.substring(0, eqPos).trim();
         const v = line.substring(eqPos + 1).trim();
         if (v == '' || k == '') continue;
-        json[k] = v;
+        json[k] = v.replaceAll('\\\\', '\n');
     }
     return json;
 }
