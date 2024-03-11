@@ -85,7 +85,7 @@ function buildTags() {
     return json;
 }
 
-// Returns a list of keys that were modified between newTags and oldTags.
+// Returns an object with three lists of keys that were added/changed/removed between newTags and oldTags.
 function getModifiedKeys(newTags, oldTags) {
     let keys = {added: [],
                 changed: [],
