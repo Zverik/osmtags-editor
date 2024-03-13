@@ -169,19 +169,21 @@ function uploadTags() {
         return;
     }
     // Iterate over possible actions and build the changeset comment
-    // For example 'Added tag smoothness to / Changed tags surface, ref of way 12345'.
+    // For example 'Added smoothness; Changed surface, ref of way 12345'.
     const possibleActions = [['added', 'to'], ['changed', 'of'], ['removed', 'from']];
     let changesetComment = '';
+    let lastPreposition = '';
     for (const [action, preposition] of possibleActions) {
         if (modifiedKeys[action].length > 0) {
-            // 'Changed tags surface, ref of way 12345'
-            const actionComment = action.charAt(0).toUpperCase() + action.slice(1) + ' tag' +
-                (modifiedKeys[action].length > 1 ? 's ' : ' ') + modifiedKeys[action].join(', ') + ' ' + preposition;
+            // actionComment might be 'Changed surface, ref'
+            const actionComment = action.charAt(0).toUpperCase() + action.slice(1) + ' ' +
+                modifiedKeys[action].join(', ');
+            lastPreposition = preposition;
             // Append the action comment to the changeset comment
-            changesetComment += (changesetComment.length > 0 ? ' / ' : '') + actionComment;
+            changesetComment += (changesetComment.length > 0 ? '; ' : '') + actionComment;
         }
     }
-    changesetComment += ' of ' + typeRef.type + ' ' + typeRef.ref;
+    changesetComment += ' ' + lastPreposition + ' ' + typeRef.type + ' ' + typeRef.ref + '.';
     
     // Prepare changeset payload.
     const typeRef = getTypeAndRef();
