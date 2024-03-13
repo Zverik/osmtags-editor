@@ -183,10 +183,13 @@ function uploadTags() {
             changesetComment += (changesetComment.length > 0 ? '; ' : '') + actionComment;
         }
     }
+    const typeRef = getTypeAndRef();
     changesetComment += ' ' + lastPreposition + ' ' + typeRef.type + ' ' + typeRef.ref + '.';
+    // Meet the 255 character limit
+    if (changesetComment.length > 255)
+        changesetComment = 'Changed tags of ' + typeRef.type + ' ' + typeRef.ref + '.';
     
     // Prepare changeset payload.
-    const typeRef = getTypeAndRef();
     const changesetTags = {
         'created_by': 'Osm.Org Tags Editor',
         'comment': changesetComment
