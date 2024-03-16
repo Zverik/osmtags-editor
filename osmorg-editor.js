@@ -85,16 +85,21 @@ function buildTags() {
     return json;
 }
 
-// Returns a list of keys that were modified between tags1 and tags2.
-function getModifiedTags(tags1, tags2) {
-    let keys = [];
-    for (const [k, v] of Object.entries(tags1)) {
-        if (!tags2.hasOwnProperty(k) || tags2[k] != v)
-            keys.unshift(k);
+// Returns an object with three lists of keys that were added/changed/removed between newTags and oldTags.
+function getModifiedKeys(newTags, oldTags) {
+    let keys = {added: [],
+                changed: [],
+                removed: []};
+    for (const [k, v] of Object.entries(newTags)) {
+        if (!oldTags.hasOwnProperty(k)) {
+            keys.added.push(k);
+        } else if (oldTags[k] != v) {
+            keys.changed.push(k);
+        }
     }
-    for (const [k, v] of Object.entries(tags2)) {
-        if (!tags1.hasOwnProperty(k))
-            keys.unshift(k);
+    for (const [k, v] of Object.entries(oldTags)) {
+        if (!newTags.hasOwnProperty(k))
+            keys.removed.push(k);
     }
     return keys;
 }
@@ -157,20 +162,37 @@ function uploadTags() {
     if (!originalObject) return;
     const xmlHeader = '<?xml version="1.0" encoding="utf-8"?>';
     const newTags = buildTags();
-    const modifiedKeys = getModifiedTags(newTags, originalObject['tags'] || {});
-    if (modifiedKeys.length == 0) {
+    const modifiedKeys = getModifiedKeys(newTags, originalObject['tags'] || {});
+    if (modifiedKeys.added.length + modifiedKeys.changed.length + modifiedKeys.removed.length == 0) {
         // If the tags are intact, just close the editor.
         closeEditor();
         return;
     }
-
-    // Prepare changeset payload.
+    // Iterate over possible actions and build the changeset comment
+    // For example 'Added smoothness; Changed surface, ref of way 12345'.
+    const possibleActions = [['added', 'to'], ['changed', 'of'], ['removed', 'from']];
+    let changesetComment = '';
+    let lastPreposition = '';
+    for (const [action, preposition] of possibleActions) {
+        if (modifiedKeys[action].length > 0) {
+            // actionComment might be 'Changed surface, ref'
+            const actionComment = action.charAt(0).toUpperCase() + action.slice(1) + ' ' +
+                modifiedKeys[action].join(', ');
+            lastPreposition = preposition;
+            // Append the action comment to the changeset comment
+            changesetComment += (changesetComment.length > 0 ? '; ' : '') + actionComment;
+        }
+    }
     const typeRef = getTypeAndRef();
+    changesetComment += ' ' + lastPreposition + ' ' + typeRef.type + ' ' + typeRef.ref + '.';
+    // Meet the 255 character limit
+    if (changesetComment.length > 255)
+        changesetComment = 'Changed tags of ' + typeRef.type + ' ' + typeRef.ref + '.';
+    
+    // Prepare changeset payload.
     const changesetTags = {
         'created_by': 'Osm.Org Tags Editor',
-        // "Changed tags surface, ref of way 12345".
-        'comment': 'Changed tag' + (modifiedKeys.length > 1 ? 's ' : ' ') +
-            modifiedKeys.join(', ') + ' of ' + typeRef.type + ' ' + typeRef.ref
+        'comment': changesetComment
     };
     let changesetPayload = document.implementation.createDocument(null, 'osm');
     let cs = changesetPayload.createElement('changeset');
