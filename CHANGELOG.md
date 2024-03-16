@@ -1,5 +1,9 @@
 # Tags Editor Changes
 
+## 1.3 (2024-03-16)
+
+* Changeset comments now split for tag modification types (thanks @Henry00572)
+
 ## 1.2 (2024-02-25)
 
 * Fixed saving changes with a `%` symbol inside tags.
