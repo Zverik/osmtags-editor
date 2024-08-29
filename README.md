@@ -12,7 +12,7 @@ a "Save" button to upload changes.
 Either open the development console and use the source code, or head over
 to your browser's extension store:
 
-* [Mozilla Firefox](https://addons.mozilla.org/ru/firefox/addon/openstreetmap-tags-editor/)
+* [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/openstreetmap-tags-editor/)
 * [Google Chrome](https://chrome.google.com/webstore/detail/openstreetmap-tags-editor/gcbcbndjajojkneicbfdaegcghgbdjnj)
 
 ## Author and License
