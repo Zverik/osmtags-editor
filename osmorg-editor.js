@@ -382,7 +382,9 @@ function updateButton(data, sender, sendResponse) {
 }
 
 // When opening the element page directly, the background process does not run.
-updateButton();
+if (location.pathname.includes('/node/') || location.pathname.includes('/way/') || location.pathname.includes('/relation/')) {
+    updateButton();
+}
 
 // Listen to messages from the background script.
 chrome.runtime.onMessage.addListener(updateButton);
