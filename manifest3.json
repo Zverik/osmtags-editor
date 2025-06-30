@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "OpenStreetMap Tags Editor",
-  "version": "1.3",
+  "version": "1.4",
 
   "description": "Adds an \"edit tags\" button to every object on osm.org.",
 

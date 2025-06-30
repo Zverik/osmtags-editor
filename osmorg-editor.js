@@ -350,8 +350,8 @@ function addTheButton() {
     // Prevent duplicate button
     if (document.querySelector('.edit_tags_class')) return true;
 
-    const actions = document.querySelector('.secondary-actions');
-    originalPanel = document.querySelector('.browse-section');
+    const actions = document.querySelector('#sidebar_content > .secondary-actions');
+    originalPanel = document.querySelector('#sidebar_content > div.border-bottom.border-secondary-subtle');
     if (!actions || !originalPanel) return false;
 
     let atag = document.createElement('a');
